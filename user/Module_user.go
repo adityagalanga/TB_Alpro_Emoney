@@ -15,7 +15,7 @@ func LoginUser() {
 	fmt.Print("99. Keluar\n")
 	fmt.Print("====================\n")
 	fmt.Print("Select Menu : ")
-	fmt.Scan(&menuInput)
+	fmt.Scanf("%d\n", &menuInput)
 	switch menuInput {
 	case 1:
 		fmt.Print("Login")
