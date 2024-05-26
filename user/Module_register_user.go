@@ -1,4 +1,4 @@
-package module
+package user
 
 import (
 	"fmt"
@@ -14,6 +14,6 @@ TODO :
 6. Cetak History dari tanggal x sampai x
 */
 
-func LoginUser() {
-	fmt.Print("USER")
+func RegisterUser() {
+	fmt.Print("Register User")
 }
