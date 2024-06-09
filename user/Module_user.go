@@ -83,7 +83,7 @@ func MainMenuUser(telp string) {
 	fmt.Scanf("%d\n", &menuInput)
 	switch menuInput {
 	case 1:
-		fmt.Println("Riwayat Transaksi")
+		ShowTransactionUser(telp)
 
 	case 2:
 		TransferMenu(telp)
@@ -171,6 +171,52 @@ func ReConfirmTransferMoney(index, targetIndex, transferValue int) {
 			MainMenuUser(vardata.UserData[index].NoTelp)
 		}
 	}
+}
+
+func ShowTransactionUser(telp string) {
+	utils.ClearConsole()
+	index := vardata.GetUserIndexByTelp(telp)
+	fmt.Print("======Riwayat Transaksi======\n")
+	fmt.Print("=============================\n")
+	x := 0
+	var onCheck bool = true
+	for onCheck {
+		if vardata.TransactionData[x].UID != 0 {
+			if vardata.TransactionData[x].Transfer_account_source == telp || vardata.TransactionData[x].Transfer_account_target == telp {
+				if vardata.TransactionData[x].Transaction_type == 1 {
+					parsedTime, err := time.Parse("2006-01-02 15:04:05.9999999 -0700 MST m=+15.999999999", vardata.TransactionData[x].Datetime)
+					if err != nil {
+						MainMenuUser(vardata.UserData[index].NoTelp)
+					}
+					date := parsedTime.Format("2006-01-02")
+					time := parsedTime.Format("15:04:05")
+					if vardata.TransactionData[x].Transfer_account_source == telp {
+						fmt.Printf("====> Type : Transfer saldo \n")
+						fmt.Printf("=> Tanggal : %s %s \n", date, time)
+						target := vardata.TransactionData[x].Transfer_account_target
+						fmt.Printf("=> Nama Penerima : %s \n", vardata.UserData[vardata.GetUserIndexByTelp(target)].Nama)
+						fmt.Printf("=> No Telp Penerima : %s \n", vardata.TransactionData[x].Transfer_account_target)
+						fmt.Printf("=> Total Transfer : Rp %d\n", vardata.TransactionData[x].Nominal)
+						fmt.Print("=============================\n")
+					} else {
+						fmt.Printf("====> Type : Menerima saldo \n")
+						fmt.Printf("=> Tanggal : %s %s \n", date, time)
+						target := vardata.TransactionData[x].Transfer_account_source
+						fmt.Printf("=> Nama Pengirim : %s \n", vardata.UserData[vardata.GetUserIndexByTelp(target)].Nama)
+						fmt.Printf("=> No Telp Pengirim : %s \n", vardata.TransactionData[x].Transfer_account_source)
+						fmt.Printf("=> Total Transfer : Rp %d\n", vardata.TransactionData[x].Nominal)
+						fmt.Print("=============================\n")
+					}
+				}
+			}
+		} else {
+			onCheck = false
+		}
+		x++
+	}
+
+	inputTemplateforBack("Selesai, enter untuk kembali")
+	MainMenuUser(vardata.UserData[index].NoTelp)
 }
 
 func inputTemplateforBack(message string) {
