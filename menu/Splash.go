@@ -25,7 +25,7 @@ func SplashMenu() {
 			admin.LoginAdmin()
 
 		case 2:
-			user.LoginUser()
+			user.PanelUser()
 
 		default:
 			SplashMenu()
