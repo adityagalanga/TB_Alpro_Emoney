@@ -6,8 +6,8 @@
   "Nama": "Aditya",
   "Email": "aditya@gmail.com",
   "NoTelp": "0821",
-  "Saldo": 0,
-  "IsActive": false
+  "Saldo": 1500,
+  "IsActive": true
  },
  {
   "UID": 2,
@@ -16,7 +16,7 @@
   "Nama": "Jo yuri",
   "Email": "adit",
   "NoTelp": "123",
-  "Saldo": 10000,
+  "Saldo": 9500,
   "IsActive": true
  },
  {

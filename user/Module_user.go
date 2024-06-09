@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"time"
 	utils "tugasbesar/utils"
 	"tugasbesar/vardata"
 )
@@ -41,7 +42,7 @@ func LoginUser() {
 	fmt.Print("Password : ")
 	fmt.Scanf("%s\n", &password)
 	fmt.Print("===============\n")
-	userIndex := getUserIndexByTelp(noTelp)
+	userIndex := vardata.GetUserIndexByTelp(noTelp)
 	var isSame = false
 	var verif = false
 	if userIndex != -1 {
@@ -51,7 +52,7 @@ func LoginUser() {
 
 	if verif && isSame {
 		//login success
-		fmt.Println("SUCCESS")
+		MainMenuUser(noTelp)
 	} else {
 		if !verif {
 			fmt.Print("=> Akun anda belum terverifikasi oleh ADMIN\n")
@@ -60,18 +61,166 @@ func LoginUser() {
 		} else {
 			fmt.Print("=> Akun tidak ditemukan\n")
 		}
-		fmt.Print("=> Tekan enter untuk kembali\n")
-		empty := ""
-		fmt.Scanf("%s\n", &empty)
+		inputTemplateforBack("Tekan enter untuk kembali")
 		PanelUser()
 	}
 }
 
-func getUserIndexByTelp(telp string) int {
-	for i := 0; i < len(vardata.UserData); i++ {
-		if vardata.UserData[i].NoTelp == telp {
-			return i
+func MainMenuUser(telp string) {
+	index := vardata.GetUserIndexByTelp(telp)
+	utils.ClearConsole()
+	fmt.Print("=============================\n")
+	fmt.Printf("=> Selamat datang %s\n", vardata.UserData[index].Nama)
+	fmt.Printf("=> No Telp %s \n", vardata.UserData[index].NoTelp)
+	fmt.Printf("=> Saldo Rp %d\n", vardata.UserData[index].Saldo)
+	fmt.Print("=============================\n")
+	fmt.Printf("=> 1. Riwayat Transaksi\n")
+	fmt.Printf("=> 2. Transfer\n")
+	fmt.Printf("=> 3. Pembayaran\n")
+	fmt.Printf("=> 4. Keluar\n")
+	fmt.Print("=============================\n")
+	fmt.Print("Select Menu : ")
+	fmt.Scanf("%d\n", &menuInput)
+	switch menuInput {
+	case 1:
+		ShowTransactionUser(telp)
+
+	case 2:
+		TransferMenu(telp)
+
+	case 3:
+		fmt.Println("Pembayaran")
+
+	case 4:
+		PanelUser()
+
+	default:
+		MainMenuUser(vardata.UserData[index].NoTelp)
+	}
+}
+
+func TransferMenu(telp string) {
+	index := vardata.GetUserIndexByTelp(telp)
+	utils.ClearConsole()
+	fmt.Print("========Transfer Uang========\n")
+	fmt.Print("=============================\n")
+	var targetTelp string
+	fmt.Print("=> No Telp Tujuan : ")
+	fmt.Scanf("%s\n", &targetTelp)
+	fmt.Print("===============\n")
+	targetIndex := vardata.GetUserIndexByTelp(targetTelp)
+
+	//target not found
+	if targetIndex == -1 {
+		inputTemplateforBack("No telp tidak ditemukan, Enter untuk kembali ke menu")
+		MainMenuUser(telp)
+	}
+	if telp == targetTelp {
+		inputTemplateforBack("Tidak dapat transfer ke akun yang sama, Enter untuk kembali ke menu")
+		MainMenuUser(telp)
+	}
+
+	// success target
+	utils.ClearConsole()
+	fmt.Print("========Transfer Uang========\n")
+	fmt.Printf("=> No Telp Akun Tujuan : %s \n", vardata.UserData[targetIndex].NoTelp)
+	fmt.Print("=============================\n")
+	fmt.Printf("=> Info Saldo Sekarang : Rp %d\n", vardata.UserData[index].Saldo)
+
+	var transferValue int = 0
+	fmt.Print("Nominal Transfer Rp ")
+	fmt.Scanf("%d\n", &transferValue)
+
+	if transferValue == 0 {
+		inputTemplateforBack("Tidak dapat transfer Rp 0, Enter untuk kembali ke menu")
+		MainMenuUser(telp)
+	} else if transferValue > vardata.UserData[index].Saldo {
+		inputTemplateforBack("Nominal Transfer melebihi saldo, Enter untuk kembali ke menu")
+		MainMenuUser(telp)
+	} else {
+		ReConfirmTransferMoney(index, targetIndex, transferValue)
+	}
+}
+
+func ReConfirmTransferMoney(index, targetIndex, transferValue int) {
+	utils.ClearConsole()
+	fmt.Print("========Transfer Uang========\n")
+	fmt.Printf("=> Nama Akun Tujuan : %s \n", vardata.UserData[targetIndex].Nama)
+	fmt.Printf("=> No Telp Akun Tujuan : %s \n", vardata.UserData[targetIndex].NoTelp)
+	fmt.Printf("=> Total Transfer : Rp %d\n", transferValue)
+	fmt.Print("=============================\n")
+	var USERPIN int = 0
+	fmt.Print("Masukan PIN untuk konfirmasi (0 untuk keluar) : ")
+	fmt.Scanf("%d\n", &USERPIN)
+	if USERPIN == 0 {
+		MainMenuUser(vardata.UserData[index].NoTelp)
+	} else {
+		if vardata.UserData[index].PIN == USERPIN {
+			var data vardata.Transaction
+			data.Transaction_type = 1
+			data.Transfer_account_source = vardata.UserData[index].NoTelp
+			data.Transfer_account_target = vardata.UserData[targetIndex].NoTelp
+			data.Nominal = transferValue
+			data.Datetime = time.Now().String()
+
+			vardata.AddNewTransferData(data)
+			inputTemplateforBack("TRANSFER SUCCESS, enter untuk kembali ke menu")
+			MainMenuUser(vardata.UserData[index].NoTelp)
+		} else {
+			inputTemplateforBack("PIN SALAH, kembali ke main menu")
+			MainMenuUser(vardata.UserData[index].NoTelp)
 		}
 	}
-	return -1
+}
+
+func ShowTransactionUser(telp string) {
+	utils.ClearConsole()
+	index := vardata.GetUserIndexByTelp(telp)
+	fmt.Print("======Riwayat Transaksi======\n")
+	fmt.Print("=============================\n")
+	x := 0
+	var onCheck bool = true
+	for onCheck {
+		if vardata.TransactionData[x].UID != 0 {
+			if vardata.TransactionData[x].Transfer_account_source == telp || vardata.TransactionData[x].Transfer_account_target == telp {
+				if vardata.TransactionData[x].Transaction_type == 1 {
+					parsedTime, err := time.Parse("2006-01-02 15:04:05.9999999 -0700 MST m=+15.999999999", vardata.TransactionData[x].Datetime)
+					if err != nil {
+						MainMenuUser(vardata.UserData[index].NoTelp)
+					}
+					date := parsedTime.Format("2006-01-02")
+					time := parsedTime.Format("15:04:05")
+					if vardata.TransactionData[x].Transfer_account_source == telp {
+						fmt.Printf("====> Type : Transfer saldo \n")
+						fmt.Printf("=> Tanggal : %s %s \n", date, time)
+						target := vardata.TransactionData[x].Transfer_account_target
+						fmt.Printf("=> Nama Penerima : %s \n", vardata.UserData[vardata.GetUserIndexByTelp(target)].Nama)
+						fmt.Printf("=> No Telp Penerima : %s \n", vardata.TransactionData[x].Transfer_account_target)
+						fmt.Printf("=> Total Transfer : Rp %d\n", vardata.TransactionData[x].Nominal)
+						fmt.Print("=============================\n")
+					} else {
+						fmt.Printf("====> Type : Menerima saldo \n")
+						fmt.Printf("=> Tanggal : %s %s \n", date, time)
+						target := vardata.TransactionData[x].Transfer_account_source
+						fmt.Printf("=> Nama Pengirim : %s \n", vardata.UserData[vardata.GetUserIndexByTelp(target)].Nama)
+						fmt.Printf("=> No Telp Pengirim : %s \n", vardata.TransactionData[x].Transfer_account_source)
+						fmt.Printf("=> Total Transfer : Rp %d\n", vardata.TransactionData[x].Nominal)
+						fmt.Print("=============================\n")
+					}
+				}
+			}
+		} else {
+			onCheck = false
+		}
+		x++
+	}
+
+	inputTemplateforBack("Selesai, enter untuk kembali")
+	MainMenuUser(vardata.UserData[index].NoTelp)
+}
+
+func inputTemplateforBack(message string) {
+	fmt.Printf("=> %s\n", message)
+	empty := ""
+	fmt.Scanf("%s\n", &empty)
 }
