@@ -40,13 +40,13 @@
   "Payment_content": ""
  },
  {
-  "UID": 0,
-  "Transaction_type": 0,
-  "Transfer_account_source": "",
-  "Transfer_account_target": "",
-  "Nominal": 0,
-  "Datetime": "",
-  "Payment_id": "",
+  "UID": 5,
+  "Transaction_type": 2,
+  "Transfer_account_source": "123",
+  "Transfer_account_target": "BaYu",
+  "Nominal": 1000,
+  "Datetime": "2024-06-11 23:12:55",
+  "Payment_id": "Pulsa 1000",
   "Payment_content": ""
  },
  {

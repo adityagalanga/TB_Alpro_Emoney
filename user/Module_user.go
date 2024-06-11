@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 	utils "tugasbesar/utils"
 	"tugasbesar/vardata"
@@ -83,13 +84,13 @@ func MainMenuUser(telp string) {
 	fmt.Scanf("%d\n", &menuInput)
 	switch menuInput {
 	case 1:
-		ShowTransactionUser(telp, true)
+		ShowTransactionUser(telp, false)
 
 	case 2:
 		TransferMenu(telp)
 
 	case 3:
-		fmt.Println("Pembayaran")
+		ShowPaymentUser(telp)
 
 	case 4:
 		PanelUser()
@@ -248,6 +249,19 @@ func ShowTransactionUser(telp string, isDescending bool) {
 				fmt.Printf("=> Total Transfer : Rp %d\n", currentData[x].Nominal)
 				fmt.Print("=============================\n")
 			}
+		} else if currentData[x].Transaction_type == 2 {
+			parsedTime, err := time.Parse("2006-01-02 15:04:05", currentData[x].Datetime)
+			if err != nil {
+				println(err)
+			}
+			date := parsedTime.Format("2006-01-02")
+			time := parsedTime.Format("15:04:05")
+			fmt.Printf("====> Type : Payment Virtual Account \n")
+			fmt.Printf("=> Tanggal : %s %s \n", date, time)
+			fmt.Printf("=> Nama Payment : %s \n", currentData[x].Transfer_account_target)
+			fmt.Printf("=> Item Payment : %s \n", currentData[x].Payment_id)
+			fmt.Printf("=> Total Payment : Rp %d\n", currentData[x].Nominal)
+			fmt.Print("=============================\n")
 		}
 	}
 	fmt.Printf("=> 1. Sort ASC\n")
@@ -267,6 +281,93 @@ func ShowTransactionUser(telp string, isDescending bool) {
 
 	default:
 		MainMenuUser(vardata.UserData[index].NoTelp)
+	}
+}
+
+func ShowPaymentUser(telp string) {
+	index := vardata.GetUserIndexByTelp(telp)
+	utils.ClearConsole()
+	fmt.Print("========PaymentEmoney========\n")
+	fmt.Print("=============================\n")
+	var targetVA string
+	fmt.Print("=> No Virtual Account : ")
+	fmt.Scanf("%s\n", &targetVA)
+	fmt.Print("===============\n")
+	firstFourDigits, err := strconv.Atoi(targetVA[:4])
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	targetIndex := vardata.GetIndexByPaymentID(firstFourDigits)
+	//target not found
+	if targetIndex == -1 {
+		inputTemplateforBack("No PaymentID tidak ditemukan, Enter untuk kembali ke menu")
+		MainMenuUser(telp)
+	}
+	// if telp == targetVA {
+	// 	inputTemplateforBack("Tidak dapat transfer ke akun yang sama, Enter untuk kembali ke menu")
+	// 	MainMenuUser(telp)
+	// }
+
+	// success target
+	utils.ClearConsole()
+	fmt.Print("========PaymentEmoney========\n")
+	fmt.Printf("=> No Virtual Account : %s \n", targetVA)
+	fmt.Printf("=> Nama Payment : %s \n", vardata.PaymentData[targetIndex].PaymentName)
+	fmt.Print("=============================\n")
+	for x := 0; x < vardata.CONST_maxPaymentItem; x++ {
+		if vardata.PaymentData[targetIndex].Item[x].ItemName != "" {
+			fmt.Printf("=> %d. %s = Rp %d\n", x+1, vardata.PaymentData[targetIndex].Item[x].ItemName, vardata.PaymentData[targetIndex].Item[x].Price)
+		}
+	}
+	fmt.Print("=============================\n")
+	var itemCheck int
+	fmt.Print("Select Menu : ")
+	fmt.Scanf("%d\n", &itemCheck)
+	if itemCheck-1 <= vardata.CONST_maxPaymentItem && itemCheck >= 0 {
+		if vardata.PaymentData[targetIndex].Item[itemCheck-1].ItemName != "" {
+			if vardata.PaymentData[targetIndex].Item[itemCheck-1].Price > vardata.UserData[index].Saldo {
+				inputTemplateforBack("Nominal Payment melebihi saldo, Enter untuk kembali ke menu")
+				MainMenuUser(telp)
+			} else {
+				ReConfirmPayment(targetVA, index, targetIndex, itemCheck-1)
+			}
+		} else {
+			MainMenuUser(telp)
+		}
+	} else {
+		MainMenuUser(telp)
+	}
+}
+func ReConfirmPayment(targetVA string, index, targetIndex, itemCheck int) {
+	utils.ClearConsole()
+	fmt.Print("========PaymentEmoney========\n")
+	fmt.Printf("=> No Virtual Account : %s \n", targetVA)
+	fmt.Printf("=> Nama Payment : %s \n", vardata.PaymentData[targetIndex].PaymentName)
+	fmt.Printf("=> Nama Item : %s \n", vardata.PaymentData[targetIndex].Item[itemCheck].ItemName)
+	fmt.Printf("=> Total Pembayaran : Rp %d\n", vardata.PaymentData[targetIndex].Item[itemCheck].Price)
+	fmt.Print("=============================\n")
+	var USERPIN int = 0
+	fmt.Print("Masukan PIN untuk konfirmasi (0 untuk keluar) : ")
+	fmt.Scanf("%d\n", &USERPIN)
+	if USERPIN == 0 {
+		MainMenuUser(vardata.UserData[index].NoTelp)
+	} else {
+		if vardata.UserData[index].PIN == USERPIN {
+			var data vardata.Transaction
+			data.Transaction_type = 2
+			data.Transfer_account_source = vardata.UserData[index].NoTelp
+			data.Transfer_account_target = vardata.PaymentData[targetIndex].PaymentName
+			data.Nominal = vardata.PaymentData[targetIndex].Item[itemCheck].Price
+			data.Payment_id = vardata.PaymentData[targetIndex].Item[itemCheck].ItemName
+			currentTime := time.Now()
+			data.Datetime = currentTime.Format("2006-01-02 15:04:05")
+			vardata.AddNewTransferData(data)
+			inputTemplateforBack("PAYMENT SUCCESS, enter untuk kembali ke menu")
+			MainMenuUser(vardata.UserData[index].NoTelp)
+		} else {
+			inputTemplateforBack("PIN SALAH, kembali ke main menu")
+			MainMenuUser(vardata.UserData[index].NoTelp)
+		}
 	}
 }
 
