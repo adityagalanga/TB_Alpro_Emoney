@@ -58,4 +58,4 @@ Setelah aplikasi berjalan, pengguna dapat mengakses endpoint untuk melakukan ber
 Jika Anda ingin berkontribusi pada proyek ini, silakan fork repositori ini dan buat pull request dengan perubahan yang Anda usulkan. Kami menyambut baik kontribusi dari siapa pun.
 
 ## version
-v0.0.1
+v0.0.2
