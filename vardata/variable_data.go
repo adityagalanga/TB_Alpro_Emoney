@@ -1,7 +1,6 @@
 package vardata
 
 import (
-	"fmt"
 	"tugasbesar/utils"
 )
 
@@ -135,7 +134,6 @@ func GetIndexByPaymentID(valueData int) int {
 		if PaymentData[mid].PaymentID == valueData {
 			return mid
 		}
-		fmt.Println(minValue, " = ", maxValue)
 		if PaymentData[mid].PaymentID < valueData {
 			maxValue = mid - 1
 		} else {

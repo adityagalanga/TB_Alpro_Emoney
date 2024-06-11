@@ -50,24 +50,24 @@
   "Payment_content": ""
  },
  {
-  "UID": 0,
-  "Transaction_type": 0,
-  "Transfer_account_source": "",
-  "Transfer_account_target": "",
-  "Nominal": 0,
-  "Datetime": "",
-  "Payment_id": "",
+  "UID": 6,
+  "Transaction_type": 2,
+  "Transfer_account_source": "123",
+  "Transfer_account_target": "Felkomcel",
+  "Nominal": 50000,
+  "Datetime": "2024-06-11 23:17:50",
+  "Payment_id": "Pulsa 50000",
   "Payment_content": ""
  },
  {
-  "UID": 0,
-  "Transaction_type": 0,
-  "Transfer_account_source": "",
-  "Transfer_account_target": "",
-  "Nominal": 0,
-  "Datetime": "",
-  "Payment_id": "",
-  "Payment_content": ""
+  "UID": 7,
+  "Transaction_type": 2,
+  "Transfer_account_source": "123",
+  "Transfer_account_target": "Felkomcel",
+  "Nominal": 50000,
+  "Datetime": "2024-06-11 23:20:02",
+  "Payment_id": "Pulsa 50000",
+  "Payment_content": "10000123"
  },
  {
   "UID": 0,
