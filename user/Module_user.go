@@ -258,6 +258,7 @@ func ShowTransactionUser(telp string, isDescending bool) {
 			time := parsedTime.Format("15:04:05")
 			fmt.Printf("====> Type : Payment Virtual Account \n")
 			fmt.Printf("=> Tanggal : %s %s \n", date, time)
+			fmt.Printf("=> Nomor Payment : %s \n", currentData[x].Payment_content)
 			fmt.Printf("=> Nama Payment : %s \n", currentData[x].Transfer_account_target)
 			fmt.Printf("=> Item Payment : %s \n", currentData[x].Payment_id)
 			fmt.Printf("=> Total Payment : Rp %d\n", currentData[x].Nominal)
@@ -359,6 +360,7 @@ func ReConfirmPayment(targetVA string, index, targetIndex, itemCheck int) {
 			data.Transfer_account_target = vardata.PaymentData[targetIndex].PaymentName
 			data.Nominal = vardata.PaymentData[targetIndex].Item[itemCheck].Price
 			data.Payment_id = vardata.PaymentData[targetIndex].Item[itemCheck].ItemName
+			data.Payment_content = targetVA
 			currentTime := time.Now()
 			data.Datetime = currentTime.Format("2006-01-02 15:04:05")
 			vardata.AddNewTransferData(data)
