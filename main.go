@@ -1,8 +1,6 @@
 package main
 
-import (
-	menu "tugasbesar/menu"
-)
+import "tugasbesar/menu"
 
 func main() {
 	//start menu
