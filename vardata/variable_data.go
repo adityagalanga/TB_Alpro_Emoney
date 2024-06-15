@@ -18,6 +18,7 @@ type User struct {
 	NoTelp   string
 	Saldo    int
 	IsActive bool
+	IsAdmin  bool
 }
 
 type Transaction struct {
@@ -141,4 +142,9 @@ func GetIndexByPaymentID(valueData int) int {
 		}
 	}
 	return -1
+}
+
+func ActivateUserData(user User) {
+	UserData[GetUserIndexByTelp(user.NoTelp)].IsActive = true
+	utils.SaveData(UserData, "UserData.json")
 }

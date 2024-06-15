@@ -87,7 +87,9 @@ func RegisterUser() {
 		}
 	}
 	//verif complete
-	inputUser.IsActive = false
+
+	inputUser.IsActive, inputUser.IsAdmin = false, false
+
 	vardata.AddNewUserData(inputUser)
 	utils.ClearConsole()
 	headerRegister()

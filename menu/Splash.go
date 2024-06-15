@@ -18,14 +18,16 @@ func SplashMenu() {
 	var inputData int = 0
 	utils.ClearConsole()
 	FrontMenu()
-	fmt.Scan(&inputData)
+	fmt.Scanf("%d\n", &inputData)
 	if inputData != 99 {
 		switch inputData {
 		case 1:
-			admin.LoginAdmin()
+			admin.PanelAdmin()
+			break
 
 		case 2:
 			user.PanelUser()
+			break
 
 		default:
 			SplashMenu()
